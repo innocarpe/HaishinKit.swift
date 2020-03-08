@@ -1,23 +1,18 @@
 import AVFoundation
 import CoreImage
 
-// MARK: -
+/// The `NetStream` class is foundation for RTMPStream, HTTPStream.
 open class NetStream: NSObject {
-    public private(set) var mixer = AVMixer()
     private static let queueKey = DispatchSpecificKey<UnsafeMutableRawPointer>()
     private static let queueValue = UnsafeMutableRawPointer.allocate(byteCount: 1, alignment: 1)
+
     public let lockQueue = ({ () -> DispatchQueue in
         let queue = DispatchQueue(label: "com.haishinkit.HaishinKit.NetStream.lock")
         queue.setSpecific(key: queueKey, value: queueValue)
         return queue
     })()
-
-    deinit {
-        metadata.removeAll()
-    }
-
+    open private(set) var mixer = AVMixer()
     open var metadata: [String: Any?] = [:]
-
     open var context: CIContext? {
         get {
             mixer.videoIO.context

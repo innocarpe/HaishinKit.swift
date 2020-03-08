@@ -187,8 +187,12 @@ open class RTMPStream: NetStream {
     static let defaultID: UInt32 = 0
     public static let defaultAudioBitrate: UInt32 = AudioConverter.defaultBitrate
     public static let defaultVideoBitrate: UInt32 = H264Encoder.defaultBitrate
-
     open weak var delegate: RTMPStreamDelegate?
+    /// Experimental. Specify the frameRate control.
+    open var frameRate: Double {
+        get { muxer.frameRate }
+        set { muxer.frameRate = newValue }
+    }
     open internal(set) var info = RTMPStreamInfo()
     open private(set) var objectEncoding: RTMPObjectEncoding = RTMPConnection.defaultObjectEncoding
     /// The number of frames per second being displayed.
@@ -313,6 +317,7 @@ open class RTMPStream: NetStream {
     }
     var audioTimestamp: Double = 0.0
     var videoTimestamp: Double = 0.0
+
     private(set) var muxer = RTMPMuxer()
     private var sampler: MP4Sampler?
     private var frameCount: UInt16 = 0
@@ -618,12 +623,12 @@ extension RTMPStream: RTMPMuxerDelegate {
             return
         }
         let type: FLVTagType = .video
-        OSAtomicOr32Barrier(1, &mixer.videoIO.encoder.locked)
+        OSAtomicOr32Barrier(1, &muxer.locked)
         let length: Int = rtmpConnection.socket.doOutput(chunk: RTMPChunk(
             type: videoWasSent ? .one : .zero,
             streamId: type.streamId,
             message: RTMPVideoMessage(streamId: id, timestamp: UInt32(videoTimestamp), payload: buffer)
-        ), locked: &mixer.videoIO.encoder.locked)
+        ), locked: &muxer.locked)
         if !videoWasSent {
             logger.debug("first video frame was sent")
         }

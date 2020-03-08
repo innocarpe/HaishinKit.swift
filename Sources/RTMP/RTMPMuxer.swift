@@ -11,9 +11,20 @@ final class RTMPMuxer {
     static let aac: UInt8 = FLVAudioCodec.aac.rawValue << 4 | FLVSoundRate.kHz44.rawValue << 2 | FLVSoundSize.snd16bit.rawValue << 1 | FLVSoundType.stereo.rawValue
 
     weak var delegate: RTMPMuxerDelegate?
+
+    var locked: UInt32 = 0
+    var frameRate = -1.0
+
     private var configs: [Int: Data] = [:]
     private var audioTimeStamp = CMTime.zero
     private var videoTimeStamp = CMTime.zero
+
+    func willDropFrame(_ sampleBuffer: CMSampleBuffer) -> Bool {
+        guard 0 < frameRate, sampleBuffer.isNotSync else {
+            return false
+        }
+        return locked != 0 || sampleBuffer.presentationTimeStamp.seconds - videoTimeStamp.seconds < (1 / frameRate) - 0.001
+    }
 
     func dispose() {
         configs.removeAll()
@@ -69,7 +80,7 @@ extension RTMPMuxer: VideoEncoderDelegate {
             compositionTime = Int32((presentationTimeStamp.seconds - decodeTimeStamp.seconds) * 1000)
         }
         let delta: Double = (videoTimeStamp == CMTime.zero ? 0 : decodeTimeStamp.seconds - videoTimeStamp.seconds) * 1000
-        guard let data = sampleBuffer.dataBuffer?.data, 0 <= delta else {
+        guard let data = sampleBuffer.dataBuffer?.data, 0 <= delta && !willDropFrame(sampleBuffer) else {
             return
         }
         var buffer = Data([((keyframe ? FLVFrameType.key.rawValue : FLVFrameType.inter.rawValue) << 4) | FLVVideoCodec.avc.rawValue, FLVAVCPacketType.nal.rawValue])

@@ -133,7 +133,6 @@ public final class H264Encoder {
             invalidateSession = true
         }
     }
-    var locked: UInt32 = 0
     var lockQueue = DispatchQueue(label: "com.haishinkit.HaishinKit.H264Encoder.lock")
     var expectedFPS: Float64 = AVMixer.defaultFPS {
         didSet {
@@ -250,7 +249,7 @@ public final class H264Encoder {
     }
 
     func encodeImageBuffer(_ imageBuffer: CVImageBuffer, presentationTimeStamp: CMTime, duration: CMTime) {
-        guard isRunning.value && locked == 0 else {
+        guard isRunning.value else {
             return
         }
         if invalidateSession {
@@ -341,7 +340,6 @@ extension H264Encoder: Running {
 #if os(iOS)
             NotificationCenter.default.removeObserver(self)
 #endif
-            OSAtomicAnd32Barrier(0, &self.locked)
             self.isRunning.mutate { $0 = false }
         }
     }
