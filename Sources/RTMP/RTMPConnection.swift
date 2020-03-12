@@ -460,7 +460,7 @@ open class RTMPConnection: EventDispatcher {
 
 extension RTMPConnection: RTMPSocketDelegate {
     // MARK: RTMPSocketDelegate
-    func didSetReadyState(_ readyState: RTMPSocketReadyState) {
+    public func didSetReadyState(_ readyState: RTMPSocketReadyState) {
         logger.debug(readyState)
         switch readyState {
         case .handshakeDone:
@@ -484,7 +484,7 @@ extension RTMPConnection: RTMPSocketDelegate {
         }
     }
 
-    func didSetTotalBytesIn(_ totalBytesIn: Int64) {
+    public func didSetTotalBytesIn(_ totalBytesIn: Int64) {
         guard windowSizeS * (sequence + 1) <= totalBytesIn else {
             return
         }
@@ -500,7 +500,7 @@ extension RTMPConnection: RTMPSocketDelegate {
         self.close(isDisconnected: true)
     }
 
-    func listen(_ data: Data) {
+    public func listen(_ data: Data) {
         guard let chunk: RTMPChunk = currentChunk ?? RTMPChunk(data, size: socket.chunkSizeC) else {
             socket.inputBuffer.append(data)
             return
