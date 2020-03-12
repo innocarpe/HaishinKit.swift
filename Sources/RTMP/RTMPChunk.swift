@@ -1,6 +1,6 @@
 import Foundation
 
-enum RTMPChunkType: UInt8 {
+public enum RTMPChunkType: UInt8 {
     case zero = 0
     case one = 1
     case two = 2
@@ -34,7 +34,7 @@ enum RTMPChunkType: UInt8 {
     }
 }
 
-final class RTMPChunk {
+public final class RTMPChunk {
     enum StreamID: UInt16 {
         case control = 0x02
         case command = 0x03
@@ -42,7 +42,7 @@ final class RTMPChunk {
         case video = 0x05
     }
 
-    static let defaultSize: Int = 128
+    public static let defaultSize: Int = 128
     static let maxTimestamp: UInt32 = 0xFFFFFF
 
     static func getStreamIdSize(_ byte: UInt8) -> Int {
@@ -273,7 +273,7 @@ final class RTMPChunk {
 
 extension RTMPChunk: CustomStringConvertible {
     // MARK: CustomStringConvertible
-    var description: String {
+    public var description: String {
         return Mirror(reflecting: self).description
     }
 }
