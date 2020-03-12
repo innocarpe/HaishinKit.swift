@@ -193,7 +193,7 @@ open class RTMPConnection: EventDispatcher {
     /// The statistics of outgoing bytes per second.
     @objc open private(set) dynamic var currentBytesOutPerSecond: Int32 = 0
 
-    var socket: RTMPSocketCompatible!
+    open var socket: RTMPSocketCompatible!
     var streams: [UInt32: RTMPStream] = [: ]
     var sequence: Int64 = 0
     var bandWidth: UInt32 = 0
