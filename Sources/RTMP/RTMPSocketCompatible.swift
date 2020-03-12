@@ -1,6 +1,6 @@
 import Foundation
 
-open enum RTMPSocketReadyState: UInt8 {
+public enum RTMPSocketReadyState: UInt8 {
     case uninitialized = 0
     case versionSent = 1
     case ackSent = 2
@@ -9,7 +9,7 @@ open enum RTMPSocketReadyState: UInt8 {
     case closed = 5
 }
 
-open protocol RTMPSocketCompatible: class {
+public protocol RTMPSocketCompatible: class {
     var timeout: Int { get set }
     var delegate: RTMPSocketDelegate? { get set }
     var connected: Bool { get }
@@ -45,7 +45,7 @@ extension RTMPSocketCompatible {
 }
 
 // MARK: -
-open protocol RTMPSocketDelegate: IEventDispatcher {
+public protocol RTMPSocketDelegate: IEventDispatcher {
     func listen(_ data: Data)
     func didSetReadyState(_ readyState: RTMPSocketReadyState)
     func didSetTotalBytesIn(_ totalBytesIn: Int64)
